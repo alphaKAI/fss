@@ -1,14 +1,25 @@
-# fss - fast file searcher with locate command
+# fss - fast file searcher
 
 ## これは何
-[mlocate](https://pagure.io/mlocate) をより使いやすくするためのツール．  
+高速なファイル検索を行うためのツール．  
+もともとは，[mlocate](https://pagure.io/mlocate) をより使いやすくするためのツールでしたが，抽象化によりほかのバックエンドにも対応可能です．  
 (mlocateはlocateコマンドとupdatedbコマンドからなり，updatedbコマンドにより生成されたDBをもとに高速にファイル/ディレクトリを検索するツールです)  
+
+
+## 対応しているバックエンド
+以下のバックエンド(searcher)に対応しています．  
+
+- locate(mlocate)
+
+`source/fss/drivers`にdriverを追加することで，他のバックエンドを追加することもできます．  
+
+また，これらのバックエンドをsearcherと呼びます．
 
 ## 事前にインストールしておくべきもの
 
 * 最新のDコンパイラ(DMD or LDC or GDC)
 * 最新のdub
-* 最新のmlocate
+* 最新のmlocateなどのバックエンド(使いたいもので大丈夫です)
 
 ## ビルド方法
 
@@ -20,9 +31,9 @@ $ dub build --build=release
 ```
 
 ## 使い方
-基本的にfssはlocateコマンドのラッパーです．つまり，最終的にlocateコマンドを呼び出します．  
-そのため，すべてのlocateコマンドのオプションが使え，更にfss独自のオプションが使えます．  
-なお，実際の検索にはlocateコマンドを用いているため，事前にupdatedbコマンドによるDBの構築が必要です．  
+
+バックエンドに指定されたプログラムをより使いやすくするためのラッパーとして動作します．  
+つまり，最終的にはそのバックエンドが呼び出され検索を行います．fssの動作としてはオプションを生成したり，バックエンドの出力の加工を行います．  
 以下にfssで使えるオプションについて記述します．   
 また，fssの動作には設定ファイルsetting.jsonが必要ですので，それについても記述します．  
 
@@ -35,21 +46,23 @@ $ dub build --build=release
 * --no-filter or --nf : fss側で出力をフィルターしたくない場合に指定します．(setting.jsonでオプションを指定している場合に，一時的に向こうにしたい場合など)
 * --full-match pattern or --fm pattern : パターンに完全に一致するファイルだけを表示します．
 * --help or -h : fssのオプションを表示します．
-* --locate-help or --lh : locateコマンドのオプションを指定します．
+* --locate-help or --lh : searcher(バックエンド)のオプションを指定します．
 
 ### 設定ファイルの記述
 FSSでは以下の項目について設定が可能です．
 
-- locateコマンドへのフルパス(必須) locate_path
-- locateコマンドへの常に渡すオプション(任意) opts : --existingなどのオプションを常に渡したい場合に指定します
-- locateコマンドの出力結果を書き換えるテーブル(任意) rep_table : locateコマンドはシンボリックリンクを貼っていた場合に，参照先のファイルのみを出力します．これを書き換えたい場合に使用します．
+- searcherへのフルパス(必須) bin_path
+- searcherのdriverの指定 driver (現在はlocateのみ対応)
+- searcherの常に渡すオプション(任意) opts : --existingなどのオプションを常に渡したい場合に指定します
+- searcherの出力結果を書き換えるテーブル(任意) rep_table : locateコマンドはシンボリックリンクを貼っていた場合に，参照先のファイルのみを出力します．これを書き換えたい場合に使用します．
 - fss独自のオプション(任意) fss_opts
 
 以下に設定ファイルの例を示します．このような内容のファイルを，`~/.config/fss/setting.json`に保存してください．
 
 ```json
 {
-  "locate_path": "/usr/bin/locate",
+  "bin_path": "/usr/bin/locate",
+  "driver" : "locate",
   "opts": [
     "-e"
   ],
