@@ -1,0 +1,9 @@
+{
+	"authors": [
+		"alphakai"
+	],
+	"copyright": "Copyright © 2019, alphakai",
+	"description": "Fast directory search tool",
+	"license": "MIT",
+	"name": "fss"
+}
