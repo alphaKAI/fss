@@ -39,6 +39,9 @@ FSSConfig readSettingFile() {
   case Locate:
     conf.type = Locate;
     break;
+  case Mdfind:
+    conf.type = Mdfind;
+    break;
   default:
     throw new Exception("Unknown driver was specified : " ~ driver_str);
   }

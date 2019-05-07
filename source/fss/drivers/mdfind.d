@@ -1,4 +1,5 @@
-module fss.drivers.locate;
+module fss.drivers.mdfind;
+
 import fss.context;
 import fss.driver;
 import fss.conf;
@@ -9,9 +10,9 @@ import std.stdio;
 import std.regex;
 import std.file;
 
-class LocateDriver : FSSDriver {
+class MdfindDriver : FSSDriver {
   DriverType type() {
-    return DriverType.Locate;
+    return DriverType.Mdfind;
   }
 
   void showHelp(FSSConfig conf) {
@@ -20,11 +21,13 @@ class LocateDriver : FSSDriver {
   }
 
   void enableFullMatch(FSSContext ctx, string full_match_str) {
-    ctx.args ~= `--regexp "^%s$" -b`.format(full_match_str);
+    ctx.enableFilterWith("^%s$".format(full_match_str));
+    ctx.args ~= "-name %s".format(full_match_str);
   }
 
   void search(FSSContext ctx) {
     string cmd = "%s %s %s".format(ctx.conf.bin_path, ctx.conf.opts.join(" "), ctx.args.join(" "));
+    writeln("cmd: ", cmd);
     auto pipes = pipeShell(cmd, Redirect.stdout | Redirect.stderr);
     scope (exit)
       wait(pipes.pid);
@@ -45,7 +48,6 @@ class LocateDriver : FSSDriver {
   }
 
   void enableSearchUnderDir(FSSContext ctx, string dir) {
-    ctx.do_filter = true;
-    ctx.rg_filter = getcwd().regex;
+    ctx.args ~= "-onlyin %s".format(dir);
   }
 }

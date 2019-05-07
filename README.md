@@ -10,6 +10,7 @@
 以下のバックエンド(searcher)に対応しています．  
 
 - locate(mlocate)
+- mdfind
 
 `source/fss/drivers`にdriverを追加することで，他のバックエンドを追加することもできます．  
 
@@ -52,7 +53,7 @@ $ dub build --build=release
 FSSでは以下の項目について設定が可能です．
 
 - searcherへのフルパス(必須) bin_path
-- searcherのdriverの指定 driver (現在はlocateのみ対応)
+- searcherのdriverの指定 driver : locate, mdfind のどちらか使用可能な方を指定してください．
 - searcherの常に渡すオプション(任意) opts : --existingなどのオプションを常に渡したい場合に指定します
 - searcherの出力結果を書き換えるテーブル(任意) rep_table : locateコマンドはシンボリックリンクを貼っていた場合に，参照先のファイルのみを出力します．これを書き換えたい場合に使用します．
 - fss独自のオプション(任意) fss_opts

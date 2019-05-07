@@ -34,8 +34,7 @@ void parse_fss_opt(FSSContext ctx, ref string[] fss_opts, bool remove_fss_opt = 
     }
 
     if (fss_opt == "--fc" || fss_opt == "--filter-current") {
-      ctx.doFilter = true;
-      ctx.rg_filter = getcwd().regex;
+      ctx.enableSearchUnderDir(getcwd());
       continue;
     }
 
@@ -43,14 +42,13 @@ void parse_fss_opt(FSSContext ctx, ref string[] fss_opts, bool remove_fss_opt = 
       if (!(i + 1 < fss_opts.length)) {
         throw new Error("--filter-with required one param");
       }
-      ctx.doFilter = true;
       skip = true;
-      ctx.rg_filter = fss_opts[i + 1].regex;
+      ctx.enableFilterWith(fss_opts[i + 1]);
       continue;
     }
 
     if (fss_opt == "--nf" || fss_opt == "--no-filter") {
-      ctx.doFilter = false;
+      ctx.disableFilter();
       continue;
     }
 
@@ -58,9 +56,8 @@ void parse_fss_opt(FSSContext ctx, ref string[] fss_opts, bool remove_fss_opt = 
       if (!(i + 1 < fss_opts.length)) {
         throw new Error("--full-match required one param");
       }
-      ctx.full_match = true;
-      ctx.full_match_str = fss_opts[i + 1];
       skip = true;
+      ctx.enableFullMatch(fss_opts[i + 1]);
       continue;
     }
 
@@ -94,7 +91,7 @@ void parse_fss_opt(FSSContext ctx, ref string[] fss_opts, bool remove_fss_opt = 
 
 void main(string[] args) {
   args = args[1 .. $];
-  bool doFilter;
+  bool do_filter;
   string filterRule;
 
   auto conf = readSettingFile();
@@ -103,6 +100,5 @@ void main(string[] args) {
 
   parse_fss_opt(ctx, ctx.conf.fss_opts);
   parse_fss_opt(ctx, ctx.args, true);
-
   ctx.search;
 }
