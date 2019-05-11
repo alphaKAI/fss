@@ -10,41 +10,20 @@ import std.regex;
 import std.file;
 
 class LocateDriver : FSSDriver {
-  DriverType type() {
+  override DriverType type() {
     return DriverType.Locate;
   }
 
-  void showHelp(FSSConfig conf) {
+  override void showHelp(FSSConfig conf) {
     auto o = executeShell("%s -h".format(conf.bin_path));
     o.output.writeln;
   }
 
-  void enableFullMatch(FSSContext ctx, string full_match_str) {
+  override void enableFullMatch(FSSContext ctx, string full_match_str) {
     ctx.args ~= `--regexp "^%s$" -b`.format(full_match_str);
   }
 
-  void search(FSSContext ctx) {
-    string cmd = "%s %s %s".format(ctx.conf.bin_path, ctx.conf.opts.join(" "), ctx.args.join(" "));
-    auto pipes = pipeShell(cmd, Redirect.stdout | Redirect.stderr);
-    scope (exit)
-      wait(pipes.pid);
-    foreach (line; pipes.stdout.byLine) {
-      // pathの読み替えをする．
-      foreach (t; ctx.conf.rep_table) {
-        line = line.replaceAll(t[0], t[1]);
-      }
-
-      if (ctx.do_filter) {
-        if (!line.matchAll(ctx.rg_filter).empty) {
-          writeln(line);
-        }
-      } else {
-        writeln(line);
-      }
-    }
-  }
-
-  void enableSearchUnderDir(FSSContext ctx, string dir) {
+  override void enableSearchUnderDir(FSSContext ctx, string dir) {
     ctx.do_filter = true;
     ctx.rg_filter = getcwd().regex;
   }

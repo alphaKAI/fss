@@ -62,4 +62,12 @@ class FSSContext {
     this.full_match = true;
     this.full_match_str = full_match_str;
   }
+
+  void setFilterFunc(bool function(string) f) {
+    this.driver.setFilterFunc(f);
+  }
+
+  void setFilterFunc(bool delegate(string) f) {
+    this.driver.setFilterFunc(f);
+  }
 }
